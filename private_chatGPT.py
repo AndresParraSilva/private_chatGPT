@@ -44,7 +44,7 @@ def get_conn_cursor():
         conn.commit()
     return conn
 
-st.header("Private chat (GPT-4 Turbo)")
+st.header("Private chatGPT (GPT-4 Turbo)")
 conn = get_conn_cursor()
 cursor = conn.cursor()
 threads = cursor.execute("SELECT DISTINCT thread FROM chats ORDER BY thread DESC").fetchall()
