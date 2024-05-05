@@ -21,6 +21,12 @@ The motivation behind developing this private ChatGPT application stems from the
 - **Database Support**: Uses SQLite to store chat messages and thread information persistently.
 - **Responsive UI**: Built using Streamlit, offering a responsive and dynamically updating user interface.
 
+## Future developments
+- **Orphan Message Cleanup**: Implement automated deletion of orphan messages that are no longer linked to any threads to maintain database efficiency.
+- **Dynamic Model Selection**: Allow users to switch between different AI models on-the-fly to adapt to diverse conversational needs and complexities.
+- **Thread Templates**: Enable saving and reusing thread templates for quick setup of common discussion patterns or topics.
+- **Image Support**: Integrate ability to handle image-based interactions, enriching the scope of conversations possible within the application.
+
 ## Prerequisites
 - Python >= 3.10
 - Streamlit

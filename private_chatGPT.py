@@ -71,11 +71,7 @@ for i in range(len_messages):
     c1, c2 = st.columns([.8, .2])
     roles[i] =message_data[id][0]
     with c1:
-        if message_data[id][0] == "assistant":
-            show_message = st.session_state["check" + str(i - 1)]
-            st.checkbox(message_data[id][0], key="check" + str(i), value=show_message, disabled=True)
-        else:
-            show_message = st.checkbox(message_data[id][0], key="check" + str(i), value=True)
+        show_message = st.checkbox(message_data[id][0], key="check" + str(i), value=True)
     if show_message:
         with c2:
             edit_message = st.toggle('Edit', key="edit" + str(i))
@@ -95,7 +91,7 @@ if texts[len_messages]:
     st.markdown("""---""")
     c1, c2 = st.columns([.8, .2])
     with c1:
-        st.checkbox(roles[len_messages], key="check" + str(len_messages), value=True)
+        st.checkbox(roles[len_messages], key="check" + str(len_messages), value=len(texts[len_messages].strip()) > 0)
     with c2:
         edit_message = st.toggle('Edit', key="edit" + str(len_messages))
     show_message = st.chat_message(roles[len_messages])
@@ -108,7 +104,7 @@ if texts[len_messages]:
     new_message_list = []
     new_id_list = []
     for i in range(len_messages + 1):
-        if texts[i]:
+        if texts[i].strip():
             new_message_list.append({"role": roles[i], "content": texts[i]})
             if i == len_messages or texts[i] != message_data[id_list[i]][1]: # New prompt or modified thread
                 new_id_list.append(db_insert_message(roles[i], texts[i], datetime.now(), state.conn))
