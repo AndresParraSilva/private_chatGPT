@@ -22,7 +22,6 @@ The motivation behind developing this private ChatGPT application stems from the
 - **Responsive UI**: Built using Streamlit, offering a responsive and dynamically updating user interface.
 
 ## Future developments
-- **Orphan Message Cleanup**: Implement automated deletion of orphan messages that are no longer linked to any threads to maintain database efficiency.
 - **Dynamic Model Selection**: Allow users to switch between different AI models on-the-fly to adapt to diverse conversational needs and complexities.
 - **Thread Templates**: Enable saving and reusing thread templates for quick setup of common discussion patterns or topics.
 - **Image Support**: Integrate ability to handle image-based interactions, enriching the scope of conversations possible within the application.
@@ -96,9 +95,25 @@ These features give you full control over the management and continuation of var
 
 The application includes unit tests to ensure functionality works as expected. You can execute these tests by running the following command in your terminal from the project root directory:
 
+```bash
 python -m unittest discover
+```
 
 This will discover and run all test cases defined in the project.
+
+## Database consistency checks
+
+- Check orphan messages
+
+```sql
+SELECT m.message_id FROM messages m LEFT JOIN threads t ON ',' || t.messages || ',' LIKE '%,' || m.message_id || ',%' WHERE t.thread_id IS NULL;
+```
+
+- Delete orphan messages
+
+```sql
+DELETE FROM messages WHERE message_id IN (SELECT m.message_id FROM messages m LEFT JOIN threads t ON ',' || t.messages || ',' LIKE '%,' || m.message_id || ',%' WHERE t.thread_id IS NULL);
+```
 
 ## Contributing
 Contributions are welcome! For major changes, please open an issue first to discuss what you would like to change.

@@ -124,6 +124,8 @@ if texts[len_messages]:
             stream=True
         )
         answer = st.write_stream(stream)
+    show_message = st.chat_message("ai")
+    show_message.write(stream)
     new_id_list.append(db_insert_message("assistant", answer, datetime.now(), state.conn))
     if same_thread:
         db_update_thread(','.join(map(str, new_id_list)), datetime.now(), state.current_thread_id, state.conn)

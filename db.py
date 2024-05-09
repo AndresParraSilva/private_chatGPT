@@ -14,8 +14,7 @@ def db_get_connection():
 
 
 def db_setup(conn):
-    cursor = conn.cursor()
-    cursor.execute('''
+    conn.execute('''
             CREATE TABLE IF NOT EXISTS messages (
                 message_id INTEGER PRIMARY KEY,
                 role TEXT,
@@ -23,10 +22,10 @@ def db_setup(conn):
                 created TIMESTAMP
             )
         ''')
-    cursor.execute('INSERT INTO messages (role, content, created) VALUES ("system", "You are a helpful assistant.", ?);', (datetime.now(),))
-    cursor.execute('INSERT INTO messages (role, content, created) VALUES ("user", "Who won the world series in 2020?", ?);', (datetime.now(),))
-    cursor.execute('INSERT INTO messages (role, content, created) VALUES ("assistant", "The Los Angeles Dodgers won the World Series in 2020.", ?);', (datetime.now(),))
-    cursor.execute('''
+    conn.execute('INSERT INTO messages (role, content, created) VALUES ("system", "You are a helpful assistant.", ?);', (datetime.now(),))
+    conn.execute('INSERT INTO messages (role, content, created) VALUES ("user", "Who won the world series in 2020?", ?);', (datetime.now(),))
+    conn.execute('INSERT INTO messages (role, content, created) VALUES ("assistant", "The Los Angeles Dodgers won the World Series in 2020.", ?);', (datetime.now(),))
+    conn.execute('''
             CREATE TABLE IF NOT EXISTS threads (
                 thread_id INTEGER PRIMARY KEY,
                 title TEXT,
@@ -35,9 +34,10 @@ def db_setup(conn):
                 last_use TIMESTAMP
             )
         ''')
+    cursor = conn.cursor()
     first_messages = cursor.execute("SELECT message_id FROM messages ORDER BY message_id LIMIT 3").fetchall()
     message_list = ','.join(map(str, [row[0] for row in first_messages]))
-    cursor.execute('INSERT INTO threads (title, messages, created, last_use) VALUES ("Example", ?, ?, ?);', (message_list, datetime.now(), datetime.now()))
+    conn.execute('INSERT INTO threads (title, messages, created, last_use) VALUES ("Example", ?, ?, ?);', (message_list, datetime.now(), datetime.now()))
     conn.commit()
 
 
@@ -62,14 +62,12 @@ def db_insert_message(role, content, created, conn):
 
 
 def db_update_thread(messages, last_use, thread_id, conn):
-    cursor = conn.cursor()
-    cursor.execute('UPDATE threads SET messages=?, last_use=? WHERE thread_id = ?;', (messages, last_use, thread_id))
+    conn.execute('UPDATE threads SET messages=?, last_use=? WHERE thread_id = ?;', (messages, last_use, thread_id))
     conn.commit()
 
 
 def db_insert_thread(title, messages, created, last_use, conn):
-    cursor = conn.cursor()
-    cursor.execute('INSERT INTO threads (title, messages, created, last_use) VALUES (?, ?, ?, ?);', (title, messages, created, last_use))
+    conn.execute('INSERT INTO threads (title, messages, created, last_use) VALUES (?, ?, ?, ?);', (title, messages, created, last_use))
     conn.commit()
 
 
@@ -79,13 +77,19 @@ def db_get_titles_like(search, conn):
 
 
 def db_update_title(title, last_use, thread_id, conn):
-    cursor = conn.cursor()
-    cursor.execute("UPDATE threads SET title = ?, last_use = ? WHERE thread_id = ?", (title, last_use, thread_id))
+    conn.execute("UPDATE threads SET title = ?, last_use = ? WHERE thread_id = ?", (title, last_use, thread_id))
     conn.commit()
 
 
-def db_delete_thread(thread_id, conn):
-    cursor = conn.cursor()
-    cursor.execute('DELETE FROM threads WHERE thread_id = ?;', (thread_id, ))
-    # ToDo: Delete orphan messages from `messages` table.
+def db_delete_thread(thread_id, conn):  
+    conn.execute("""
+        DELETE FROM messages
+        WHERE message_id IN (
+            SELECT m.message_id
+            FROM messages m
+                INNER JOIN threads t1 ON ',' || t1.messages || ',' LIKE '%,' || m.message_id || ',%'
+                LEFT JOIN threads t2 ON t2.thread_id <> ? AND ',' || t2.messages || ',' LIKE '%,' || m.message_id || ',%'
+            WHERE t1.thread_id = ?
+                AND t2.thread_id IS NULL);""", (thread_id, thread_id))
+    conn.execute('DELETE FROM threads WHERE thread_id = ?;', (thread_id, ))
     conn.commit()
