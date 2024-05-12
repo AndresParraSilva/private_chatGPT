@@ -19,7 +19,6 @@ st.header("Private chatGPT (GPT-4 Turbo)")
 
 # DB connection
 state.conn = db_get_connection()
-cursor = state.conn.cursor()
 
 # Sidebar with thread list
 if st.sidebar.button("New empty thread", use_container_width=True):
@@ -124,13 +123,12 @@ if texts[len_messages]:
             stream=True
         )
         answer = st.write_stream(stream)
-    show_message = st.chat_message("ai")
-    show_message.write(stream)
     new_id_list.append(db_insert_message("assistant", answer, datetime.now(), state.conn))
     if same_thread:
         db_update_thread(','.join(map(str, new_id_list)), datetime.now(), state.current_thread_id, state.conn)
     else:
-        db_insert_thread(get_new_thread_title(threads[current_thread_index][1], state.conn), ','.join(map(str, new_id_list)), datetime.now(), datetime.now(), state.conn)
+        change_title(state.current_thread_id, None, threads[current_thread_index][1], state.conn)
+        db_insert_thread(threads[current_thread_index][1], ','.join(map(str, new_id_list)), datetime.now(), datetime.now(), state.conn)
         for i in range(len_messages):
             del st.session_state["check" + str(i)]
             if "edit" + str(i) in st.session_state:

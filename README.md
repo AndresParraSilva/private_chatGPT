@@ -22,7 +22,8 @@ The motivation behind developing this private ChatGPT application stems from the
 - **Responsive UI**: Built using Streamlit, offering a responsive and dynamically updating user interface.
 
 ## Future developments
-- **Dynamic Model Selection**: Allow users to switch between different AI models on-the-fly to adapt to diverse conversational needs and complexities.
+- **Dynamic Model Selection**: Allow user to switch between different AI models on-the-fly to adapt to diverse conversational needs and complexities.
+- **Temperature parameter**: Allow user to specify/change the `temparature` parameter.
 - **Thread Templates**: Enable saving and reusing thread templates for quick setup of common discussion patterns or topics.
 - **Image Support**: Integrate ability to handle image-based interactions, enriching the scope of conversations possible within the application.
 
