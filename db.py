@@ -19,12 +19,15 @@ def db_setup(conn):
                 message_id INTEGER PRIMARY KEY,
                 role TEXT,
                 content TEXT,
+                model TEXT,
+                temperature FLOAT,
+                edited BOOLEAN,
                 created TIMESTAMP
             )
         ''')
-    conn.execute('INSERT INTO messages (role, content, created) VALUES ("system", "You are a helpful assistant.", ?);', (datetime.now(),))
-    conn.execute('INSERT INTO messages (role, content, created) VALUES ("user", "Who won the world series in 2020?", ?);', (datetime.now(),))
-    conn.execute('INSERT INTO messages (role, content, created) VALUES ("assistant", "The Los Angeles Dodgers won the World Series in 2020.", ?);', (datetime.now(),))
+    conn.execute('INSERT INTO messages (role, content, created, model, temperature, edited) VALUES ("system", "You are a helpful assistant.", NULL, NULL, NULL, ?);', (datetime.now(),))
+    conn.execute('INSERT INTO messages (role, content, created, model, temperature, edited) VALUES ("user", "Who won the world series in 2020?", NULL, NULL, NULL, ?);', (datetime.now(),))
+    conn.execute('INSERT INTO messages (role, content, created, model, temperature, edited) VALUES ("assistant", "The Los Angeles Dodgers won the World Series in 2020.", "gpt-4o", 1.0, FALSE, ?);', (datetime.now(),))
     conn.execute('''
             CREATE TABLE IF NOT EXISTS threads (
                 thread_id INTEGER PRIMARY KEY,
@@ -49,14 +52,15 @@ def db_get_threads(conn):
 def db_get_messages(id_list, conn):
     cursor = conn.cursor()
     return cursor.execute(f"""
-        SELECT message_id, role, content
+        SELECT message_id, role, content, model, temperature, edited
         FROM messages
-        WHERE message_id IN ({','.join(["?"] * len(id_list))});""", (*id_list, )).fetchall()
+        WHERE message_id IN ({','.join(["?"] * len(id_list))})
+        ORDER BY created;""", (*id_list, )).fetchall()
 
 
-def db_insert_message(role, content, created, conn):
+def db_insert_message(role, content, model, temperature, edited, created, conn):
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO messages (role, content, created) VALUES (?, ?, ?);', (role, content, created))
+    cursor.execute('INSERT INTO messages (role, content, model, temperature, edited, created) VALUES (?, ?, ?, ?, ?, ?);', (role, content, model, temperature, edited, created))
     conn.commit()
     return cursor.lastrowid
 

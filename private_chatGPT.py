@@ -21,8 +21,29 @@ st.header("Private chatGPT (GPT-4 Turbo)")
 state.conn = db_get_connection()
 
 # Sidebar with thread list
+
+if "model_index" not in state:
+    state["model_index"] = 0
+
+if "temperature" not in state:
+    state["temperature"] = 1.0
+
+available_models = [
+    "gpt-4o",
+    "gpt-4-turbo",
+    "gpt-4",
+    "gpt-3.5-turbo",
+]
+
+def update_model_index():
+    state["model_index"] = available_models.index(state.model)
+    st.sidebar.write(f"changed to {state['model_index']}")
+
+st.sidebar.radio("Model", available_models, index=state.model_index, on_change=update_model_index, key="model")
+state["temperature"] = st.sidebar.slider("Temperature", min_value=0.0, value=state["temperature"], max_value=2.0, step=.1, key="temperature_slider")
+
 if st.sidebar.button("New empty thread", use_container_width=True):
-    new_message_id = db_insert_message("system", "You are a helpful assistant.", datetime.now(), state.conn)
+    new_message_id = db_insert_message("system", "You are a helpful assistant.", None, None, None, datetime.now(), state.conn)
     db_insert_thread(get_new_thread_title("Example", state.conn), str(new_message_id), datetime.now(), datetime.now(), state.conn)
 
 threads = db_get_threads(state.conn)
@@ -55,10 +76,10 @@ if delete_thread:
 
 # Messages of selected thread
 id_list = [int(id) for id in threads[current_thread_index][2].split(',')]
-messages = db_get_messages(id_list, state.conn)
+messages = db_get_messages(id_list, state.conn)  # message_id, role, content, model, temperature, edited
 message_data = dict()
 for message in messages:
-    message_data[message[0]] = [message[1], message[2]]
+    message_data[message[0]] = [message[1], message[2], message[3], message[4], message[5]]
 
 len_messages = len(messages)
 texts = [""] * (len_messages + 1)
@@ -66,11 +87,22 @@ roles = [""] * (len_messages + 1)
 for i in range(len_messages):
     id = id_list[i]
     if message_data[id][0] == "user":
-        st.markdown("""---""")
+        st.markdown("---")
     c1, c2 = st.columns([.8, .2])
-    roles[i] =message_data[id][0]
+    roles[i] = message_data[id][0]
     with c1:
-        show_message = st.checkbox(message_data[id][0], key="check" + str(i), value=True)
+        checkbox_title = roles[i]
+        if roles[i] == 'assistant':
+            add_details = []
+            if message_data[id][2] is not None:
+                add_details.append(f"model={message_data[id][2]}")
+            if message_data[id][3] is not None:
+                add_details.append(f"temperature={message_data[id][3]:.1f}")
+            if message_data[id][4]:
+                add_details.append("edited")
+            if add_details:
+                checkbox_title += f" ({', '.join(add_details)})"
+        show_message = st.checkbox(checkbox_title, key="check" + str(i), value=True)
     if show_message:
         with c2:
             edit_message = st.toggle('Edit', key="edit" + str(i))
@@ -97,7 +129,7 @@ if texts[len_messages]:
     show_message.write(texts[len_messages])
     same_thread = True
     for i in range(len_messages):
-        if texts[i] != message_data[id_list[i]][1]:
+        if texts[i] != message_data[id_list[i]][1] and not (i == 0 and len_messages == 1):
             same_thread = False
             break
     new_message_list = []
@@ -105,25 +137,28 @@ if texts[len_messages]:
     for i in range(len_messages + 1):
         if texts[i].strip():
             new_message_list.append({"role": roles[i], "content": texts[i]})
-            if i == len_messages or texts[i] != message_data[id_list[i]][1]: # New prompt or modified thread
-                new_id_list.append(db_insert_message(roles[i], texts[i], datetime.now(), state.conn))
+            if i == len_messages:  # New prompt
+                new_id_list.append(db_insert_message(roles[i], texts[i], None, None, None, datetime.now(), state.conn))
+            elif texts[i] != message_data[id_list[i]][1]:  # Modified message
+                new_id_list.append(db_insert_message(roles[i], texts[i], message_data[id_list[i]][2], message_data[id_list[i]][3], True, datetime.now(), state.conn))
             else:
                 new_id_list.append(id_list[i])
 
     client = get_client()
     c1, c2 = st.columns([.8, .2])
     with c1:
-        st.checkbox("assistant", key="check" + str(len_messages+1), value=True)
+        st.checkbox(f"assistant (model={state['model']}, temperature={state['temperature']:.1f})", key="check" + str(len_messages+1), value=True)
     with c2:
         st.toggle('Edit', key="edit" + str(len_messages+1))
     with st.chat_message("assistant"):
         stream = client.chat.completions.create(
-            model="gpt-4-turbo",  # ToDo: Variable model in st.session_state["model"],
+            model=state['model'],
+            temperature=state['temperature'],
             messages=new_message_list,
             stream=True
         )
         answer = st.write_stream(stream)
-    new_id_list.append(db_insert_message("assistant", answer, datetime.now(), state.conn))
+    new_id_list.append(db_insert_message("assistant", answer, state['model'], state['temperature'], False, datetime.now(), state.conn))
     if same_thread:
         db_update_thread(','.join(map(str, new_id_list)), datetime.now(), state.current_thread_id, state.conn)
     else:

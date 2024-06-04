@@ -5,6 +5,7 @@ from openai import OpenAI, OpenAIError
 
 from db import *
 
+
 @st.cache_resource
 def get_client():
     return OpenAI()
@@ -18,7 +19,7 @@ def get_new_thread_title(proposed_title, conn):
     else:
         search = proposed_title
     existing = db_get_titles_like(search, conn)
-    if len(existing) == 0:
+    if len(existing) == 0 or proposed_title not in [t[0] for t in existing]:
         return proposed_title
     else:
         matching_list = []
