@@ -1,0 +1,107 @@
+Datos Personales y Contexto para Conversaciones sobre Alimentos:
+    Edad: 55 años (nacido en 1970).
+    Altura: 1.70 m.
+    Etnia: Hispano mixto con pueblos originarios de Chile.
+    Ocupación: Ingeniero en software, sentado la mayor parte del día.
+    Ubicación: Ciudad de Buenos Aires, Argentina
+Últimos análisis de sangre (17/04/2025, salvo PSA):
+    Hemograma Completo:
+        Recuento de Glóbulos Rojos: 4.81 x 10^12/L
+        Hemoglobina: 15.3 g/dL
+        Hematocrito: 44%
+        VCM: 91.7 fL
+        HCM: 31.8 pg
+        CHCM: 34.7 g/dL
+        RDW: 12.8%
+        Recuento de Glóbulos Blancos: 5.0 x 10^9/L
+        Neutrófilos en cayado: 0%
+        Neutrófilos en cayado (valor absoluto): 0.0 x 10^9/L
+        Neutrófilos Segmentados: 62%
+        Neutrófilos Segmentados (valor absoluto): 3.1 x 10^9/L
+        Linfocitos: 25%
+        Linfocitos (valor absoluto): 1.2 x 10^9/L
+        Monocitos: 9%
+        Monocitos (valor absoluto): 0.4 x 10^9/L
+        Basófilos: 1%
+        Basófilos (valor absoluto): 0.1 x 10^9/L
+        Eosinófilos: 3%
+        Eosinófilos (valor absoluto): 0.1 x 10^9/L
+        Recuento de Plaquetas: 219 x 10^9/L
+    Uremia: 27 mg/dL
+    Índice de Filtrado Glomerular Estimado:
+        Creatininemia: 1.06 mg/dL
+        IFGe: 83 mL/min/1.73 m²
+    Uricemia: 4.32 mg/dL
+    Colesterol HDL: 58 mg/dL
+    Índice de Castelli (Col. Total/Col. HDL): 3.2
+    NO-HDL Colesterol: 127 mg/dL
+    Colesterol LDL: 115 mg/dL
+    Triglicéridos: 61 mg/dL
+    Hepatograma Completo:
+        Proteínas Totales: 6.76 g/dL
+        Albúmina: 4.57 g/dL
+        Colesterol Total: 186 mg/dL
+        Bilirrubina Total: 0.77 mg/dL
+        Bilirrubina Directa: 0.29 mg/dL
+        Bilirrubina Indirecta: 0.48 mg/dL
+        GPT (ALAT): 18 U/L
+        GOT (ASAT): 23 U/L
+        Fosfatasa Alcalina (FAL): 78 U/L
+    Glucemia: 81 mg/dL
+    TSH - Tirotrofina: 1.53 µUI/mL
+    PSA - Antígeno Prostático Específico: 2.57 ng/mL (30/04/2025)
+    Examen de Orina:
+        Físico-Químico:
+            Aspecto: Límpido
+            Color: Amarillo
+            pH: 5.5
+            Densidad: 1.017
+            Proteínas: Negativo
+            Nitritos: Negativo
+            Hemoglobina: Negativo
+            Urobilinógeno: Normal
+            Glucosa: Negativo
+            Bilirrubina: Negativo
+            Cetonas: Negativo
+        Microscópico del Sedimento:
+            Células Epiteliales: <1/µL
+            Leucocitos: <1/µL
+            Hematíes: 2/µL
+            Mucus: No se observa
+Actividad Física: Corredor frecuente, 5 sesiones semanales de 40 minutos en cinta seguidas de 9 sets con mancuernas (intensidad moderada) antes del desayuno.
+Condiciones de Salud:
+    Esteatosis hepática leve (detectada en ecografía, aumento de ecogenicidad difusa).
+    Bilirrubina directa elevada (0.29 mg/dL, referencia hasta 0.20 mg/dL, posible estrés hepático).
+    Sin alergias ni intolerancias.
+Preferencias Alimenticias:
+    Evitar (por gusto): pepino, berenjenas.
+Peso Actual: 69.5 kg (76 kg hace 4 meses).
+Objetivo: Mantenerme alrededor de los 69 Kg, mejorar mi forma física, cuidar situaciones de riesgo.
+Desayuno diario post-ejercicio (40 min cinta + mancuernas):
+* 60 g de avena integral
+* 120 g de yogur griego natural sin azúcar
+* 40 g de arándanos secos
+* 10 g de semillas de chía
+* 1 cucharada de miel
+---
+Tengo poco tiempo para cocinar al medio día, por lo que necesito preparar mis almuerzos con antelación. Teniendo en cuenta mi contexto y necesidades, por favor recomiéndame una lista de 5 recetas variadas para dejar preparadas el fin de semana, guardar en heladera o freezer, y simplemente calentar en microondas cada día de la semana. Detalla la preparación de cada uno de ellos, con cantidades en gramos y cronograma de pasos en minutos, y al final prepara la lista de las compras para ir a verdulería, dietética, pescadería, y/o supermercado.
+
+
+Tengo 100g de lentejas en remojo desde ayer. Recomiéndame cómo prepararlas para un almuerzo saludable.
+Otros ingredientes diponibles:
+1 Zanahoria
+1 Tomate
+1 cebolla
+1 calabaza
+Brócoli
+Avena instantánea
+Yogur griego
+Semillas de girasol
+Semillas de quinoa
+Queso port salut
+Tomates secos
+Mix de frutos secos
+Chía molida
+Medallones de quinoa congelados
+Pechuga de pollo congelada
+Carne de res congelada
