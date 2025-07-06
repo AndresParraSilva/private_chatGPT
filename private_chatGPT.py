@@ -15,7 +15,7 @@ state = st.session_state
 # ToDo:
 # Add templates table and functionality
 
-st.header("Private chatGPT (GPT-4 Turbo)")
+st.header("Private chatGPT")
 
 # DB connection
 state.conn = db_get_connection()
@@ -26,15 +26,24 @@ if "model_index" not in state:
     state["model_index"] = 0
 
 if "temperature" not in state:
-    state["temperature"] = 1.0
+    state["temperature"] = 0.6
 
 available_models = [
     # "o1-preview",
     # "o1-mini",
-    "gpt-4o",
-    "gpt-4-turbo",
-    "gpt-4",
-    "gpt-3.5-turbo",
+    # "gpt-4o",
+    # "gpt-4-turbo",
+    # "gpt-4",
+    # "gpt-3.5-turbo",
+    "gpt-4.1-nano/Fastest, most cost-effective 4.1 $0.1/0.4",
+    "o4-mini/Faster, more affordable reasoning model $1.1/4.4",
+    "gpt-4.1/Flagship GPT model for complex tasks $2/8",
+    "o3-mini/Our most powerful reasoning model (small) $1.1/4.4",
+    "gpt-image-1/$5",
+    "gpt-4o-mini-tts/$0.015 x minute",
+    "gpt-4o-mini-transcribe/$0.003 x minute",
+    "codex-mini-latest/$1.5/6",
+    "o4-mini-deep-research/$2/8",
 ]
 
 
@@ -232,7 +241,7 @@ if texts[len_messages]:
     c1, c2 = st.columns([0.8, 0.2])
     with c1:
         st.checkbox(
-            f"assistant (model={state['model']}, temperature={state['temperature']:.1f})",
+            f"assistant (model={state['model'].split('/')[0]}, temperature={state['temperature']:.1f})",
             key="check" + str(len_messages + 1),
             value=True,
         )
@@ -240,7 +249,7 @@ if texts[len_messages]:
         st.toggle("Edit", key="edit" + str(len_messages + 1))
     with st.chat_message("assistant"):
         stream = client.chat.completions.create(
-            model=state["model"],
+            model=state["model"].split("/")[0],
             temperature=state["temperature"],
             messages=new_message_list,
             stream=True,
@@ -250,7 +259,7 @@ if texts[len_messages]:
         db_insert_message(
             "assistant",
             answer,
-            state["model"],
+            state["model"].split("/")[0],
             state["temperature"],
             False,
             datetime.now(),
