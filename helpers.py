@@ -6,8 +6,12 @@ from openai import OpenAI, OpenAIError
 from db import *
 
 
-def get_client():
-    return OpenAI()
+def get_client(tier):
+    if tier == "flex":
+        timeout = 900.0
+    else:
+        timeout = 600.0
+    return OpenAI(timeout=timeout)
 
 
 def get_new_thread_title(proposed_title, conn):

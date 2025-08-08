@@ -25,19 +25,14 @@ state.conn = db_get_connection()
 if "model_index" not in state:
     state["model_index"] = 0
 
-if "temperature" not in state:
-    state["temperature"] = 0.6
-
 available_models = [
-    # "o1-preview",
-    # "o1-mini",
-    # "gpt-4o",
-    # "gpt-4-turbo",
-    # "gpt-4",
-    # "gpt-3.5-turbo",
+    "gpt-5-nano/$0.05/0.4",
+    "gpt-5-mini/$0.25/2",
+    "gpt-5/$1.25/10",
     "gpt-4.1-nano/Fastest, most cost-effective 4.1 $0.1/0.4",
-    "o4-mini/Faster, more affordable reasoning model $1.1/4.4",
+    "gpt-4.1-mini/$0.4/1.6",
     "gpt-4.1/Flagship GPT model for complex tasks $2/8",
+    "o4-mini/Faster, more affordable reasoning model $1.1/4.4",
     "o3-mini/Our most powerful reasoning model (small) $1.1/4.4",
     "gpt-image-1/$5",
     "gpt-4o-mini-tts/$0.015 x minute",
@@ -46,10 +41,42 @@ available_models = [
     "o4-mini-deep-research/$2/8",
 ]
 
+if "tier_index" not in state:
+    state["tier_index"] = 0
+
+available_tiers = [
+    "flex",
+    "priority",
+    "default",
+]
+
+if "effort_index" not in state:
+    state["effort_index"] = 0
+
+available_efforts = [
+    "minimal",
+    "low",
+    "medium",
+    "high",
+]
+
+if "temperature" not in state:
+    state["temperature"] = 1.0
+
 
 def update_model_index():
     state["model_index"] = available_models.index(state.model)
     st.sidebar.write(f"changed to {state['model_index']}")
+
+
+def update_tier_index():
+    state["tier_index"] = available_tiers.index(state.tier)
+    st.sidebar.write(f"changed to {state['tier_index']}")
+
+
+def update_effort_index():
+    state["effort_index"] = available_efforts.index(state.effort)
+    st.sidebar.write(f"changed to {state['effort_index']}")
 
 
 st.sidebar.radio(
@@ -59,6 +86,23 @@ st.sidebar.radio(
     on_change=update_model_index,
     key="model",
 )
+
+st.sidebar.radio(
+    "Processing Tier",
+    available_tiers,
+    index=state.tier_index,
+    on_change=update_tier_index,
+    key="tier",
+)
+
+st.sidebar.radio(
+    "Reasoning Effort",
+    available_efforts,
+    index=state.effort_index,
+    on_change=update_effort_index,
+    key="effort",
+)
+
 state["temperature"] = st.sidebar.slider(
     "Temperature",
     min_value=0.0,
@@ -72,6 +116,7 @@ if st.sidebar.button("New empty thread", use_container_width=True):
     new_message_id = db_insert_message(
         "system",
         "You are a helpful assistant.",
+        None,
         None,
         None,
         None,
@@ -136,7 +181,7 @@ if delete_thread:
 id_list = [int(id) for id in threads[current_thread_index][2].split(",")]
 messages = db_get_messages(
     id_list, state.conn
-)  # message_id, role, content, model, temperature, edited
+)  # message_id, role, content, model, effort, temperature, edited
 message_data = dict()
 for message in messages:
     message_data[message[0]] = [
@@ -145,6 +190,7 @@ for message in messages:
         message[3],
         message[4],
         message[5],
+        message[6],
     ]
 
 len_messages = len(messages)
@@ -163,8 +209,10 @@ for i in range(len_messages):
             if message_data[id][2] is not None:
                 add_details.append(f"model={message_data[id][2]}")
             if message_data[id][3] is not None:
-                add_details.append(f"temperature={message_data[id][3]:.1f}")
-            if message_data[id][4]:
+                add_details.append(f"effort={message_data[id][3]}")
+            if message_data[id][4] is not None:
+                add_details.append(f"temperature={message_data[id][4]:.1f}")
+            if message_data[id][5]:
                 add_details.append("edited")
             if add_details:
                 checkbox_title += f" ({', '.join(add_details)})"
@@ -219,16 +267,17 @@ if texts[len_messages]:
             if i == len_messages:  # New prompt
                 new_id_list.append(
                     db_insert_message(
-                        roles[i], texts[i], None, None, None, datetime.now(), state.conn
+                        roles[i], texts[i], None, None, None, None, datetime.now(), state.conn
                     )
                 )
             elif texts[i] != message_data[id_list[i]][1]:  # Modified message
                 new_id_list.append(
-                    db_insert_message(
+                    db_insert_message(  # role, content, model, effort, temperature, edited, created, conn
                         roles[i],
                         texts[i],
                         message_data[id_list[i]][2],
                         message_data[id_list[i]][3],
+                        message_data[id_list[i]][4],
                         True,
                         datetime.now(),
                         state.conn,
@@ -237,11 +286,11 @@ if texts[len_messages]:
             else:
                 new_id_list.append(id_list[i])
 
-    client = get_client()
+    client = get_client(state["tier"])
     c1, c2 = st.columns([0.8, 0.2])
     with c1:
         st.checkbox(
-            f"assistant (model={state['model'].split('/')[0]}, temperature={state['temperature']:.1f})",
+            f"assistant (model={state['model'].split('/')[0]}, effort={state['effort']}, temperature={state['temperature']:.1f})",
             key="check" + str(len_messages + 1),
             value=True,
         )
@@ -251,6 +300,8 @@ if texts[len_messages]:
         stream = client.chat.completions.create(
             model=state["model"].split("/")[0],
             temperature=state["temperature"],
+            service_tier=state["tier"],
+            reasoning_effort=state["effort"],
             messages=new_message_list,
             stream=True,
         )
@@ -260,6 +311,7 @@ if texts[len_messages]:
             "assistant",
             answer,
             state["model"].split("/")[0],
+            state["effort"],
             state["temperature"],
             False,
             datetime.now(),

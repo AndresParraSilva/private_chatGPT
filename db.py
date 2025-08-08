@@ -20,14 +20,15 @@ def db_setup(conn):
                 role TEXT,
                 content TEXT,
                 model TEXT,
+                effort TEXT,
                 temperature FLOAT,
                 edited BOOLEAN,
                 created TIMESTAMP
             )
         ''')
-    conn.execute('INSERT INTO messages (role, content, created, model, temperature, edited) VALUES ("system", "You are a helpful assistant.", NULL, NULL, NULL, ?);', (datetime.now(),))
-    conn.execute('INSERT INTO messages (role, content, created, model, temperature, edited) VALUES ("user", "Who won the world series in 2020?", NULL, NULL, NULL, ?);', (datetime.now(),))
-    conn.execute('INSERT INTO messages (role, content, created, model, temperature, edited) VALUES ("assistant", "The Los Angeles Dodgers won the World Series in 2020.", "gpt-4o", 1.0, FALSE, ?);', (datetime.now(),))
+    conn.execute('INSERT INTO messages (role, content, created, model, effort, temperature, edited) VALUES ("system", "You are a helpful assistant.", NULL, NULL, NULL, NULL, ?);', (datetime.now(),))
+    conn.execute('INSERT INTO messages (role, content, created, model, effort, temperature, edited) VALUES ("user", "Who won the world series in 2020?", NULL, NULL, NULL, NULL, ?);', (datetime.now(),))
+    conn.execute('INSERT INTO messages (role, content, created, model, effort, temperature, edited) VALUES ("assistant", "The Los Angeles Dodgers won the World Series in 2020.", "gpt-4o", "low", 1.0, FALSE, ?);', (datetime.now(),))
     conn.execute('''
             CREATE TABLE IF NOT EXISTS threads (
                 thread_id INTEGER PRIMARY KEY,
@@ -52,15 +53,15 @@ def db_get_threads(conn):
 def db_get_messages(id_list, conn):
     cursor = conn.cursor()
     return cursor.execute(f"""
-        SELECT message_id, role, content, model, temperature, edited
+        SELECT message_id, role, content, model, effort, temperature, edited
         FROM messages
         WHERE message_id IN ({','.join(["?"] * len(id_list))})
         ORDER BY created;""", (*id_list, )).fetchall()
 
 
-def db_insert_message(role, content, model, temperature, edited, created, conn):
+def db_insert_message(role, content, model, effort, temperature, edited, created, conn):
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO messages (role, content, model, temperature, edited, created) VALUES (?, ?, ?, ?, ?, ?);', (role, content, model, temperature, edited, created))
+    cursor.execute('INSERT INTO messages (role, content, model, effort, temperature, edited, created) VALUES (?, ?, ?, ?, ?, ?, ?);', (role, content, model, effort, temperature, edited, created))
     conn.commit()
     return cursor.lastrowid
 
