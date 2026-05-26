@@ -41,7 +41,7 @@ httplib2==0.22.0
 httpx==0.28.1
 hyperframe==6.1.0
 identify==2.6.12
-idna==3.7
+idna==3.16
 importlib_metadata==8.6.1
 invoke==1.7.3
 jaraco.classes==3.4.0
@@ -91,7 +91,7 @@ pre_commit==4.2.0
 proto-plus==1.26.1
 protobuf==5.29.6
 psycopg2-binary==2.9.9
-pyarrow==17.0.0
+pyarrow==24.0.0
 pyasn1==0.6.3
 pyasn1_modules==0.4.2
 pycparser==2.22
@@ -140,12 +140,12 @@ tenacity==8.5.0
 toml==0.10.2
 tomlkit==0.13.2
 toolz==0.12.1
-torch==2.8.0
+torch==2.12.0
 tornado==6.5.5
 tqdm==4.67.1
 trio==0.26.0
 trio-websocket==0.11.1
-triton==3.4.0
+triton==3.7.0
 twine==3.8.0
 typing_extensions==4.14.1
 tzdata==2024.1
