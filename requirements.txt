@@ -140,12 +140,12 @@ tenacity==8.5.0
 toml==0.10.2
 tomlkit==0.13.2
 toolz==0.12.1
-torch==2.12.0
+torch==2.12.1
 tornado==6.5.7
 tqdm==4.67.1
 trio==0.26.0
 trio-websocket==0.11.1
-triton==3.7.0
+triton==3.7.1
 twine==3.8.0
 typing_extensions==4.14.1
 tzdata==2024.1
