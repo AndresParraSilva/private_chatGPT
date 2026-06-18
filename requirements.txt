@@ -12,7 +12,7 @@ charset-normalizer==3.3.2
 click==8.1.7
 click-log==0.4.0
 colorama==0.4.6
-cryptography==46.0.7
+cryptography==49.0.0
 deprecation==2.1.0
 distlib==0.3.9
 distro==1.9.0
@@ -99,7 +99,7 @@ pydantic==2.8.2
 pydantic_core==2.20.1
 pydeck==0.9.1
 Pygments==2.20.0
-PyJWT==2.12.0
+PyJWT==2.13.0
 pynvim==0.5.0
 pyparsing==3.2.3
 pyperclip==1.8.2
@@ -141,7 +141,7 @@ toml==0.10.2
 tomlkit==0.13.2
 toolz==0.12.1
 torch==2.12.0
-tornado==6.5.5
+tornado==6.5.7
 tqdm==4.67.1
 trio==0.26.0
 trio-websocket==0.11.1
