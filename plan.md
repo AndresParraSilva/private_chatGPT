@@ -1,11 +1,11 @@
-# Dependency vulnerability remediation plan
+# Private ChatGPT dependency vulnerabilities
 
-Dependabot's saved alert page identifies vulnerable pins in `requirements.txt` for PyJWT, urllib3, Tornado, virtualenv, and GitPython. The listed releases below address the corresponding alerts; virtualenv 21.7.13 covers its prompt/configuration and activation-script issues as well as the seed-wheel integrity alert.
+- [x] Re-audit pinned requirements and the actual runtime, recording `msgpack`, `pyasn1`, and `tornado` versions and advisory paths.
+- [x] Establish an isolated representative environment and tests with disposable databases and mocked external APIs; preserve private chat data and do not send messages.
+- [x] Evaluate compatible fixes, initially `msgpack` 1.2.3 or later, `pyasn1` 0.6.5 or later, and `tornado` 6.6 or later, preserving unrelated pins.
+- [x] Re-audit and run safe offline checks against the baseline; document any compatibility or verification blockers.
+- [x] Commit and push only verified dependency changes.
 
-## To-Do
+Verification notes: PyPI's advisory API reports no known advisories for the 161 current pins. No running app or identifiable project runtime was found. A disposable Python 3.12 environment excluded Torch, Triton, and NVIDIA packages. Before and after upgrades, 9 of 11 tests passed; `test_db_insert_message` uses an outdated signature and `test_get_new_thread_title_with_extension` has an existing expectation mismatch. The environment's dependency check also reported the same existing typing-inspection mismatch and missing pytokens and python-discovery dependencies before and after the upgrade. Targeted package smoke checks and Python compilation passed. The pip-audit launcher was broken and an isolated pip-audit invocation stalled; PyPI's advisory API was queried for each pin instead.
 
-- [x] Update only these pins in `requirements.txt`: `PyJWT==2.15.0`, `urllib3==2.8.0`, `tornado==6.5.9`, `virtualenv==21.7.13`, and `GitPython==3.1.62`. The PyJWT and virtualenv targets were advanced after the first targeted audit found newer advisories fixed in 2.15.0 and 21.7.13.
-- [x] Audit the updated vulnerable packages against the current vulnerability database; the five upgraded packages have no known vulnerabilities.
-- [x] Checked for a project virtual environment; none is present, so installed-package reconciliation was unavailable. No unrelated packages were added.
-- [x] Ran both existing unittest modules with temporary runtime dependencies. Two tests fail for existing application/test mismatches: title increment expected `Example (3)` but returned `Example`, and `test_db_insert_message` calls a function with an outdated signature.
-- [x] Recorded task outcomes in this plan.
+GitHub additionally reported GHSA-cx6f-vjhg-g3cc for virtualenv 21.14.10, absent from the PyPI advisory feed. Updated it to 21.14.13 and successfully created a disposable environment with it. Installing it also installed its python-discovery dependency, resolving that baseline check issue. GitHub still displayed the alert immediately after the push; its status may take time to update.
