@@ -1,11 +1,14 @@
-# Private ChatGPT dependency vulnerabilities
+# Dependency security audit plan
 
-- [x] Re-audit pinned requirements and the actual runtime, recording `msgpack`, `pyasn1`, and `tornado` versions and advisory paths.
-- [x] Establish an isolated representative environment and tests with disposable databases and mocked external APIs; preserve private chat data and do not send messages.
-- [x] Evaluate compatible fixes, initially `msgpack` 1.2.3 or later, `pyasn1` 0.6.5 or later, and `tornado` 6.6 or later, preserving unrelated pins.
-- [x] Re-audit and run safe offline checks against the baseline; document any compatibility or verification blockers.
-- [x] Commit and push only verified dependency changes.
+Previous plan preserved in `plan20261102.md`; consult it for project context and unfinished work.
 
-Verification notes: PyPI's advisory API reports no known advisories for the 161 current pins. No running app or identifiable project runtime was found. A disposable Python 3.12 environment excluded Torch, Triton, and NVIDIA packages. Before and after upgrades, 9 of 11 tests passed; `test_db_insert_message` uses an outdated signature and `test_get_new_thread_title_with_extension` has an existing expectation mismatch. The environment's dependency check also reported the same existing typing-inspection mismatch and missing pytokens and python-discovery dependencies before and after the upgrade. Targeted package smoke checks and Python compilation passed. The pip-audit launcher was broken and an isolated pip-audit invocation stalled; PyPI's advisory API was queried for each pin instead.
+- [x] Review project instructions, working tree, dependency manifests, environments, and prior audit results.
+- [x] Audit the requirements using the intended Python environment. The previous isolated resolution timed out; investigate the resolution and avoid leaving child processes running.
+- [x] If this project uses Node.js, inventory its runtime declarations and environments. Require Node 22 or newer; update Node 22 to at least 22.23.4, Node 24 to at least 24.22.1, and Node 26 to at least 26.12.1. Verify compatibility and the project’s build and tests after updates.
+- [x] Apply only compatible fixes that preserve functionality; record advisory IDs, versions, dependency paths, and any findings that cannot be safely fixed.
+- [x] Repeat the applicable audits and run the project’s tests or build; document failures and any limits on verification.
+- [x] Review the diff and existing staged changes. If changes are verified to preserve functionality, commit the dependency changes together with unstaged `plan*.md` files, then push to the configured remote; otherwise report the blocker without pushing.
 
-GitHub additionally reported GHSA-cx6f-vjhg-g3cc for virtualenv 21.14.10, absent from the PyPI advisory feed. Updated it to 21.14.13 and successfully created a disposable environment with it. Installing it also installed its python-discovery dependency, resolving that baseline check issue. GitHub still displayed the alert immediately after the push; its status may take time to update.
+Follow-up: `uv pip compile --python-version 3.12 requirements.txt` resolved the full dependency graph; pip-audit found no known vulnerabilities in both the original pins and the resulting graph. GitHub reports no open Dependabot alerts. The earlier pip-based timeout was not reproduced with uv; its precise cause remains unknown. No Node.js manifest was found. Prior isolated test and environment limitations are recorded in the previous plan.
+
+Verification: isolated Python 3.12 tests with Streamlit 1.66.1 and OpenAI 1.41.0 ran against copied code and in-memory SQLite: 9 passed, with the same two pre-existing failures documented in the previous plan (outdated insert signature and thread-title expectation). No dependency versions changed; this targeted environment did not install the full GPU stack. The previous pip resolver timeout remains unexplained, but the full pinned graph resolved with uv and audited cleanly.
